@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/downloads/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16%2B-orange.svg)](https://www.tensorflow.org/)
 
-Paquete reproducible asociado al Trabajo Final de Grado **"Análisis y evaluación de métodos alternativos de posicionamiento indoor basados en WiFi RTT en dispositivos Android"** (Universitat Oberta de Catalunya, 2026).
+Paquete reproducible asociado al Trabajo Final de Grado **"Posicionamiento indoor con WiFi RTT en dispositivos Android: adaptación de CAE-CNNLoc y evaluación comparativa frente a centroide ponderado y KNN-DtC"** (Universitat Oberta de Catalunya, 2026).
 
 > **Autor:** José Luis Mena Maestro · **Tutor:** Joaquín Torres-Sospedra · **PRA:** Antoni Pérez-Navarro.
 
@@ -131,7 +131,7 @@ Si este código te resulta útil, te agradeceríamos que cites el TFG:
 ```bibtex
 @misc{menamaestro2026tfg,
   author       = {Mena Maestro, Jos\'e Luis},
-  title        = {{An\'alisis y evaluaci\'on de m\'etodos alternativos de posicionamiento indoor basados en WiFi RTT en dispositivos Android}},
+  title        = {{Posicionamiento indoor con WiFi RTT en dispositivos Android: adaptaci\'on de CAE-CNNLoc y evaluaci\'on comparativa frente a centroide ponderado y KNN-DtC}},
   year         = {2026},
   note         = {Trabajo Final de Grado, Universitat Oberta de Catalunya},
   howpublished = {\url{https://github.com/jolumena-uoc/tfg-cae-cnnloc-rtt-rp}}

@@ -2,9 +2,9 @@ tfg-cae-cnnloc-rtt-rp
 Copyright 2026 José Luis Mena Maestro
 
 This product includes software developed as part of the Final Degree Project
-(Trabajo Final de Grado) "Análisis y evaluación de métodos alternativos de
-posicionamiento indoor basados en WiFi RTT en dispositivos Android"
-at Universitat Oberta de Catalunya (UOC), 2026.
+(Trabajo Final de Grado) "Posicionamiento indoor con WiFi RTT en dispositivos
+Android: adaptación de CAE-CNNLoc y evaluación comparativa frente a centroide
+ponderado y KNN-DtC" at Universitat Oberta de Catalunya (UOC), 2026.
 
 Tutor: Joaquín Torres-Sospedra.
 Responsible Professor (PRA): Antoni Pérez-Navarro.

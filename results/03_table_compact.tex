@@ -1,0 +1,16 @@
+\begin{table}[!htbp]
+\centering
+\caption{Comparativa global de los tres métodos por escenario, expresada como \textbf{error medio / mediano} en metros. Cada celda usa la mejor variante por familia (centroide ponderado con ventana 5\,s; KNN-DtC con $k{=}1$ y ventana 5\,s; CAE-CNNLoc 2D-Temporal con $N{=}16$ promediado sobre 5 semillas).}
+\label{tab:comparativa_global}
+\begin{tabular}{l c c c c}
+\hline
+\textbf{Método} & \textbf{auto} & \textbf{cross-pose} & \textbf{cross-device} & \textbf{cross-both} \\
+\hline
+Centroide ponderado & 1.72 / 1.49 & --\textsuperscript{\dag} & --\textsuperscript{\dag} & --\textsuperscript{\dag} \\
+KNN-DtC ($k{=}1$, ventana 5\,s) & $0$ (trivial)\textsuperscript{*} & 0.47 / 0.00 & 0.27 / 0.00 & 0.56 / 0.00 \\
+CAE-CNNLoc 2D-Temporal ($N{=}16$) & 0.24 / 0.20 & 0.83 / 0.72 & 2.00 / 1.64 & 2.05 / 1.71 \\
+\hline
+\multicolumn{5}{l}{\footnotesize \textsuperscript{*} En el escenario \emph{auto} con $k{=}1$ el vecino más cercano es siempre el propio punto de entrenamiento.} \\
+\multicolumn{5}{l}{\footnotesize \textsuperscript{\dag} El centroide ponderado es un método sin entrenamiento; su error es independiente del subset.} \\
+\end{tabular}
+\end{table}

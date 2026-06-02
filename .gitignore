@@ -1,0 +1,56 @@
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Jupyter ----------------------------------------------------------------
+.jupyter/
+
+# --- OS ---------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# --- IDE --------------------------------------------------------------------
+.vscode/
+.idea/
+
+# --- TensorFlow / modelos entrenados ---------------------------------------
+results/checkpoints/
+results/tensorboard/
+results/*.h5
+results/*.keras
+.tf_data_cache/
+
+# --- Logs y ficheros temporales --------------------------------------------
+*.log
+*.tmp
+*~
+
+# --- Volcados pesados regenerables -----------------------------------------
+# Se mantienen los agregados (*_summary*.csv, *_compact*.csv, *_history*.csv,
+# 03_best_per_family_scenario.csv) y todas las figuras (PDF/PNG).
+# Los volcados por muestra se regeneran ejecutando los notebooks/scripts.
+results/01_baselines_centroid.csv
+results/01_baselines_knn_dtc.csv
+results/01_baselines_knn_dtc_per_pair.csv
+results/02_cnnloc_results.csv
+results/02_cnnloc_full_results.csv
+results/02_cnnloc_full_results_partial.csv
+results/03_unified_results.csv
+results/tune_nwindow_results.csv
+
+# --- Datos del dataset (NO redistribuir) -----------------------------------
+# Los datos se obtienen del paquete reproducible original de Matey-Sanz y
+# Torres-Sospedra (ver data/README.md).
+data/01_DATA/
+data/raw/
+*.npy
+*.npz

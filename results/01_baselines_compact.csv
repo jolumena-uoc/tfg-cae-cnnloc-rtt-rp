@@ -1,0 +1,16 @@
+metodo,ventana,mean_m,median_m,p95_m
+Centroide ponderado,raw,1.801,1.576,3.545
+KNN-DtC k=1,raw,0.911,0.0,3.831
+KNN-DtC k=3,raw,0.863,0.0,3.538
+KNN-DtC k=5,raw,0.849,0.0,3.425
+KNN-DtC k=10,raw,0.843,0.163,3.293
+Centroide ponderado,1s,1.741,1.523,3.366
+KNN-DtC k=1,1s,0.499,0.0,2.545
+KNN-DtC k=3,1s,0.513,0.0,2.026
+KNN-DtC k=5,1s,0.516,0.0,2.169
+KNN-DtC k=10,1s,0.526,0.0,2.153
+Centroide ponderado,5s,1.721,1.488,2.98
+KNN-DtC k=1,5s,0.436,0.0,1.635
+KNN-DtC k=3,5s,0.46,0.0,1.635
+KNN-DtC k=5,5s,0.49,0.0,1.751
+KNN-DtC k=10,5s,0.727,0.518,1.898

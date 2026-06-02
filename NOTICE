@@ -1,0 +1,19 @@
+tfg-cae-cnnloc-rtt-rp
+Copyright 2026 José Luis Mena Maestro
+
+This product includes software developed as part of the Final Degree Project
+(Trabajo Final de Grado) "Análisis y evaluación de métodos alternativos de
+posicionamiento indoor basados en WiFi RTT en dispositivos Android"
+at Universitat Oberta de Catalunya (UOC), 2026.
+
+Tutor: Joaquín Torres-Sospedra.
+Responsible Professor (PRA): Antoni Pérez-Navarro.
+
+This software adapts the CAE-CNNLoc architecture originally proposed by
+Kargar-Barzi et al. (IEEE Access, 2024) from WiFi RSSI to WiFi RTT
+fingerprinting, and uses the public Wi-Fi RTT dataset published by
+Matey-Sanz and Torres-Sospedra (Zenodo, DOI 10.5281/zenodo.15391797).
+
+The dataset itself is licensed under the Open Data Commons Attribution
+License (ODbL) and is NOT redistributed in this repository. Refer to
+data/README.md for instructions to obtain it from its original source.

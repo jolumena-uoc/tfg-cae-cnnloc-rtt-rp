@@ -1,72 +1,78 @@
-"""Regenera 03_comparativa_cdf_generalisation.{pdf,png} con disposición 3x1 vertical.
+"""Regenera `results/03_comparativa_cdf_generalisation.pdf`: CDFs comparativas
+del centroide ponderado, KNN-DtC ($k=1$, ventana 5 s) y CAE-CNNLoc 2D-T
+($N=16$) en los tres escenarios cruzados (cross-pose, cross-device, cross-both).
 
-Lee los resultados unificados ya producidos por el notebook 03_comparativa.ipynb.
+Lee `results/01_baselines_per_sample.csv` y `results/02_cnnloc_per_sample.csv`,
+producidos por `scripts/aggregate_summary.py` y `scripts/run_cnnloc_full.py`.
 """
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
-RESULTS = ROOT / "results"
-OVERLEAF_FIG = Path(r"C:/TFG/Overleaf/Figuras/resultados/comparativa_cdf_generalisation.pdf")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+RESULTS = REPO_ROOT / "results"
 
-UNIFIED = RESULTS / "03_unified_results.csv"
-df_all = pd.read_csv(UNIFIED)
-
-
-def plot_cdf(ax, errors, **kwargs):
-    e = np.sort(np.asarray(errors, dtype=float))
-    if len(e) == 0:
-        return
-    cdf = np.arange(1, len(e) + 1) / len(e)
-    ax.plot(e, cdf, **kwargs)
-
-
-FIXED_VARIANTS = {
-    "KNN-DtC": "KNN-DtC-k1_w5s",
-    "CAE-CNNLoc-2D": "CAE-CNNLoc-2D-N16",
-}
-LABEL_MAP = {
-    "KNN-DtC": "KNN-DtC (k=1, 5s)",
-    "CAE-CNNLoc-2D": "CAE-CNNLoc 2D-T (N=16)",
+METHOD_COLOR = {
+    "Centroide": "#1f77b4",
+    "KNN-DtC ($k{=}1$)": "#2ca02c",
+    "CAE-CNNLoc 2D-T ($N{=}16$)": "#d62728",
 }
 
-fig, axes = plt.subplots(3, 1, figsize=(7.0, 9.6), sharex=True)
-for ax, scen in zip(axes, ["cross-pose", "cross-device", "cross-both"]):
-    for fam, color in [("KNN-DtC", "tab:blue"), ("CAE-CNNLoc-2D", "tab:red")]:
-        var = FIXED_VARIANTS[fam]
-        sub = df_all[
-            (df_all["family"] == fam)
-            & (df_all["variant"] == var)
-            & (df_all["scenario"] == scen)
-        ]
-        if sub.empty:
-            continue
-        plot_cdf(ax, sub["error"], label=LABEL_MAP[fam], color=color, linewidth=1.8)
-    ax.set_xlim(0, 8)
-    ax.set_ylabel("CDF")
-    ax.set_title(f"Escenario: {scen}")
-    ax.grid(alpha=0.3)
-    ax.legend(fontsize=10, loc="lower right")
-axes[-1].set_xlabel("Error de localización (m)")
-fig.suptitle(
-    "CDF del error: KNN-DtC vs CAE-CNNLoc 2D-Temporal por escenario", y=0.995
-)
-fig.tight_layout()
 
-png_out = RESULTS / "03_comparativa_cdf_generalisation.png"
-pdf_out = RESULTS / "03_comparativa_cdf_generalisation.pdf"
-fig.savefig(png_out, dpi=150, bbox_inches="tight")
-fig.savefig(pdf_out, bbox_inches="tight")
-plt.close(fig)
+def cdf(values):
+    v = np.sort(np.asarray(values, dtype=float))
+    return v, np.arange(1, len(v) + 1) / len(v)
 
-# Copia al directorio Overleaf para que LaTeX lo encuentre.
-OVERLEAF_FIG.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(pdf_out, OVERLEAF_FIG)
-print(f"Generado: {pdf_out}")
-print(f"Copiado : {OVERLEAF_FIG}")
+
+def main() -> None:
+    base_src = RESULTS / "01_baselines_per_sample.csv"
+    cnn_src = RESULTS / "02_cnnloc_per_sample.csv"
+    if not base_src.exists() or not cnn_src.exists():
+        raise SystemExit(
+            "No se encuentran los CSVs de muestras. Lanza antes:\n"
+            "  python scripts/aggregate_summary.py\n"
+            "  python scripts/run_cnnloc_full.py"
+        )
+    base = pd.read_csv(base_src)
+    cnn = pd.read_csv(cnn_src)
+
+    fig, axes = plt.subplots(3, 1, figsize=(7.0, 9.6), sharex=True)
+    for ax, scen in zip(axes, ["cross-pose", "cross-device", "cross-both"]):
+        sub_c = base[(base["method"] == "centroid") & (base["scenario"] == scen)]
+        if len(sub_c):
+            v, c = cdf(sub_c["error"].values)
+            ax.plot(v, c, lw=2, color=METHOD_COLOR["Centroide"], label="Centroide")
+        sub_k = base[(base["method"] == "knn_dtc_k1") & (base["scenario"] == scen)]
+        if len(sub_k):
+            v, c = cdf(sub_k["error"].values)
+            ax.plot(v, c, lw=2, color=METHOD_COLOR["KNN-DtC ($k{=}1$)"],
+                    label="KNN-DtC ($k{=}1$)")
+        sub_n = cnn[cnn["scenario"] == scen]
+        if len(sub_n):
+            v, c = cdf(sub_n["error"].values)
+            ax.plot(v, c, lw=2, color=METHOD_COLOR["CAE-CNNLoc 2D-T ($N{=}16$)"],
+                    label="CAE-CNNLoc 2D-T ($N{=}16$)")
+        ax.set_xlim(0, 6)
+        ax.set_ylim(0, 1)
+        ax.set_ylabel("CDF")
+        ax.set_title(f"Escenario {scen}", fontsize=11)
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=9, loc="lower right")
+    axes[-1].set_xlabel("Error (m)")
+    fig.tight_layout()
+
+    out = RESULTS / "03_comparativa_cdf_generalisation.pdf"
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Generado: {out}")
+
+
+if __name__ == "__main__":
+    main()

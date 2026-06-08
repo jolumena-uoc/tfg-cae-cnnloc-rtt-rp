@@ -42,8 +42,10 @@ tfg-cae-cnnloc-rtt-rp/
 │   ├── 02_cnnloc.ipynb            # CAE-CNNLoc 2D-Temporal
 │   └── 03_comparativa.ipynb       # tabla unificada y CDFs comparativas
 ├── scripts/                       # scripts reproducibles fuera de los notebooks
-│   ├── run_full.py                # entrenamiento multi-semilla completo
-│   ├── tune_nwindow.py            # barrido del hiperparámetro N
+│   ├── run_cnnloc_one.py          # CAE-CNNLoc para una (subconjunto, semilla)
+│   ├── run_cnnloc_full.py         # orquestador 4 subconjuntos x 5 semillas
+│   ├── aggregate_summary.py       # CSVs resumen de baselines y CAE-CNNLoc
+│   ├── tune_nwindow.py            # barrido del hiperparámetro N (8/16/32)
 │   ├── rerun_knn_dtc_per_pair.py  # re-ejecución de KNN-DtC por (train, test)
 │   ├── regenerate_baselines_cdf.py
 │   ├── regenerate_cnnloc_curves.py
@@ -104,25 +106,35 @@ El conjunto de datos **no se redistribuye** en este repositorio (lo prohíbe la 
 
 ### Versión "todo de golpe"
 
-Si solo interesa regenerar resultados y figuras sin abrir Jupyter:
+Si solo interesa regenerar resultados y figuras sin abrir Jupyter, el flujo completo (cinco semillas, agregación temporal de 5 s) se reproduce con la siguiente secuencia. Los pasos 1 y 2 generan los CSVs crudos de los baselines (no se versionan por tamaño); los pasos 3 y 4 entrenan y agregan CAE-CNNLoc; los pasos 5–8 regeneran las figuras del documento.
 
 ```bash
-python scripts/run_full.py                    # entrena CAE-CNNLoc multi-semilla
-python scripts/regenerate_anx_figures.py      # figuras de los anexos
+# 1. Baselines: centroide ponderado y KNN-DtC (todas las ventanas y k)
+jupyter nbconvert --to notebook --execute notebooks/01_baselines.ipynb \
+    --output notebooks/01_baselines.ipynb
+python scripts/rerun_knn_dtc_per_pair.py     # KNN-DtC por par (train, test)
+
+# 2. Barrido del hiperparámetro N (tabla y figura del anexo)
+python scripts/tune_nwindow.py
+
+# 3. CAE-CNNLoc 2D-Temporal: 4 subconjuntos x 5 semillas
+python scripts/run_cnnloc_full.py
+
+# 4. Consolida resúmenes y produce tabla_global.csv
+python scripts/aggregate_summary.py
+
+# 5-8. Figuras de la memoria
 python scripts/regenerate_baselines_cdf.py
 python scripts/regenerate_cnnloc_curves.py
 python scripts/regenerate_cdf_gen.py
+python scripts/regenerate_anx_figures.py
 ```
 
-El barrido del hiperparámetro `N` se ejecuta con:
-
-```bash
-python scripts/tune_nwindow.py
-```
+El orquestador `run_cnnloc_full.py` invoca internamente a `run_cnnloc_one.py` (que también puede ejecutarse de manera aislada para una sola combinación, p. ej. `python scripts/run_cnnloc_one.py --train POCO#STANDING --seed 0`). El paquete reproducible original de Matey-Sanz y Torres-Sospedra debe estar disponible como carpeta hermana del repositorio (o indicada con la variable de entorno `MATEY_RTT_DIR`); de allí provienen los enumerados `Device` y `MeasuringType` y el dataset.
 
 ## Resultados versionados
 
-Para mantener el repositorio ligero, sólo se versionan los **CSVs agregados** (`*_summary.csv`, `*_compact.csv`, `*_history.csv`, `03_best_per_family_scenario.csv`) y todas las **figuras** (PDF/PNG) que aparecen en la memoria del TFG. Los volcados crudos por muestra se regeneran al ejecutar los notebooks/scripts y están listados en `.gitignore` para no versionarse.
+Para mantener el repositorio ligero, sólo se versionan los **CSVs agregados** (`*_summary.csv`, `*_per_sample.csv`, `*_history.csv`, `*_curves.csv`, `tabla_global.csv`) y las **figuras** (PDF) que aparecen en la memoria del TFG. Los volcados intermedios por (subconjunto, semilla) se regeneran al ejecutar los scripts y están listados en `.gitignore` para no versionarse.
 
 ## Cómo citar
 

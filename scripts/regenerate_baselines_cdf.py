@@ -1,60 +1,70 @@
-"""Regenera 01_baselines_cdf.{pdf,png} con disposición 3x1 vertical.
+"""Regenera `results/01_baselines_cdf.pdf`: CDFs del centroide ponderado y
+KNN-DtC ($k=1$, ventana 5 s) para los tres escenarios cruzados (cross-pose,
+cross-device, cross-both).
 
-Lee las CSVs ya producidas por el notebook 01_baselines.ipynb.
+Lee `results/01_baselines_per_sample.csv` (producido por
+`scripts/aggregate_summary.py`) y escribe el PDF correspondiente.
 """
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
-RESULTS = ROOT / "results"
-OVERLEAF_FIG = Path(r"C:/TFG/Overleaf/Figuras/resultados/baselines_cdf.pdf")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+RESULTS = REPO_ROOT / "results"
 
-df_centroid = pd.read_csv(RESULTS / "01_baselines_centroid.csv")
-df_knn = pd.read_csv(RESULTS / "01_baselines_knn_dtc.csv")
-
-
-def plot_cdf(ax, errors, label, **kw):
-    e = np.sort(np.asarray(errors, dtype=float))
-    if len(e) == 0:
-        return
-    cdf = np.arange(1, len(e) + 1) / len(e)
-    ax.plot(e, cdf, label=label, **kw)
+SCEN_COLOR = {
+    "cross-pose": "#ff7f0e",
+    "cross-device": "#2ca02c",
+    "cross-both": "#d62728",
+}
 
 
-fig, axes = plt.subplots(3, 1, figsize=(7.0, 9.6), sharex=True)
-for ax, w in zip(axes, ["raw", "1s", "5s"]):
-    sub_c = df_centroid[df_centroid["window"] == w]
-    plot_cdf(ax, sub_c["error"], "Centroide", color="tab:orange", linewidth=2)
-    for k, color in zip(
-        [1, 3, 5, 10],
-        ["tab:blue", "tab:green", "tab:red", "tab:purple"],
-    ):
-        sub_k = df_knn[
-            (df_knn["window"] == w) & (df_knn["method"] == f"KNN-DtC-k{k}")
-        ]
-        plot_cdf(ax, sub_k["error"], f"KNN-DtC k={k}", color=color, linewidth=1.5)
-    ax.set_xlim(0, 8)
-    ax.set_ylabel("CDF")
-    ax.set_title(f"Ventana = {w}")
-    ax.grid(alpha=0.3)
-axes[-1].set_xlabel("Error de localización (m)")
-axes[0].legend(fontsize=9, loc="lower right")
-fig.suptitle("CDF del error: centroide ponderado vs KNN-DtC", y=0.995)
-fig.tight_layout()
+def cdf(values):
+    v = np.sort(np.asarray(values, dtype=float))
+    return v, np.arange(1, len(v) + 1) / len(v)
 
-png_out = RESULTS / "01_baselines_cdf.png"
-pdf_out = RESULTS / "01_baselines_cdf.pdf"
-fig.savefig(png_out, dpi=150, bbox_inches="tight")
-fig.savefig(pdf_out, bbox_inches="tight")
-plt.close(fig)
 
-OVERLEAF_FIG.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(pdf_out, OVERLEAF_FIG)
-print(f"Generado: {pdf_out}")
-print(f"Copiado : {OVERLEAF_FIG}")
+def main() -> None:
+    src = RESULTS / "01_baselines_per_sample.csv"
+    if not src.exists():
+        raise SystemExit(
+            f"No se encuentra {src}. Lanza primero "
+            f"`python scripts/aggregate_summary.py`."
+        )
+    df = pd.read_csv(src)
+
+    fig, axes = plt.subplots(2, 1, figsize=(7.0, 8.0), sharex=True)
+    titles = ["Centroide ponderado", "KNN-DtC ($k{=}1$)"]
+    methods = ["centroid", "knn_dtc_k1"]
+    cross_scenarios = ["cross-pose", "cross-device", "cross-both"]
+    for ax, t, m in zip(axes, titles, methods):
+        ax.set_title(t, fontsize=11)
+        for scen in cross_scenarios:
+            sub = df[(df["method"] == m) & (df["scenario"] == scen)]
+            if len(sub) == 0:
+                continue
+            v, c = cdf(sub["error"].values)
+            ax.plot(v, c, lw=2, color=SCEN_COLOR[scen], label=scen)
+        ax.set_xlim(0, 6)
+        ax.set_ylim(0, 1)
+        ax.set_ylabel("CDF")
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=9, loc="lower right")
+    axes[-1].set_xlabel("Error (m)")
+    fig.tight_layout()
+
+    out = RESULTS / "01_baselines_cdf.pdf"
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Generado: {out}")
+
+
+if __name__ == "__main__":
+    main()

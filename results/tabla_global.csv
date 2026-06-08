@@ -1,0 +1,4 @@
+scenario,cent_mean,cent_median,knn_mean,knn_median,cnn_mean,cnn_std,cnn_median
+cross-pose,1.721,1.486,0.475,0.000,0.920,0.046,0.809
+cross-device,1.721,1.486,0.273,0.000,2.011,0.244,1.871
+cross-both,1.721,1.486,0.559,0.000,2.067,0.232,1.918
